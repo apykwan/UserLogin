@@ -1,16 +1,27 @@
+import jwt from 'jsonwebtoken';
+
 import { Resolvers } from '../__generated__/resolvers-types';
+import { userService } from './user/user.service';
 
 export const authResolvers: Resolvers = {
   Mutation: {
     async signup(parent, { input }, context) {
-     
-      return {
-        user: {
-          id: 1,
-          ...input
+      const existingUser = await userService.findOneByEmail(input.email);
+      const user = await userService.create(input);
+
+      const jwtToken = jwt.sign(
+        {
+          email: input.email,
+          userId: user.id
         },
-        jwt: 'asdf'
-      }
+        process.env.JWT_KEY!,
+        { expiresIn: '77 days' }
+      ); 
+      
+      return {
+        user,
+        jwt: jwtToken
+      };
     }
   },
   Query: {

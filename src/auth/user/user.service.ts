@@ -14,6 +14,10 @@ export class UserService {
 
     return await this.userRepository.save(user);
   }
+
+  async findOneByEmail(email: string) {
+    return await this.userRepository.findOneBy({ email });
+  }
 }
 
 export const userService = new UserService(AppDataSource.getRepository(User));
