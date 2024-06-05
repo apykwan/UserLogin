@@ -13,17 +13,28 @@ input SignupInput {
   lastName: String!
 }
 
+input SigninInput {
+  email: String!
+  password: String!
+}
+
 type AuthResponse {
   user: User!
   jwt: String!
 }
 
+type JwtPayload {
+  email: String!
+  userId: Int!
+}
+
 type Mutation {
   signup(input: SignupInput!): AuthResponse!
+  signin(input: SigninInput!): AuthResponse!
 }
 
 type Query {
-  get: String
+  currentUser: JwtPayload
 }
 
 schema {
