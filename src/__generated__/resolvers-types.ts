@@ -71,7 +71,7 @@ export type MutationSignupArgs = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<JwtPayload>;
-  rooms?: Maybe<Array<Maybe<Room>>>;
+  getRooms?: Maybe<Array<Maybe<Room>>>;
 };
 
 export type Room = {
@@ -240,7 +240,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<Maybe<ResolversTypes['JwtPayload']>, ParentType, ContextType>;
-  rooms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Room']>>>, ParentType, ContextType>;
+  getRooms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Room']>>>, ParentType, ContextType>;
 }>;
 
 export type RoomResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = ResolversObject<{

@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import { Server } from 'socket.io';
 
 import { Room } from './entity/room.entity';
 import { User } from '../../auth/user/entity/user.entity';
@@ -13,13 +14,29 @@ import { Message } from '../../__generated__/resolvers-types';
 export class RoomService {
   constructor(public roomRepository: Repository<Room>) {}
 
-  async addMessageToRoom(roomId: number, message: Message) {
+  async getAllRooms(userId: number) {
+    const queryBuilder = this.roomRepository.createQueryBuilder('room');
+
+    return await queryBuilder
+      .innerJoin('room.users', 'u')
+      .where('u.id = :id', { id: userId })
+      .getMany();
+  }
+
+  async addMessageToRoom(roomId: number, message: Message, io?: Server) {
     const queryBuilder = this.roomRepository.createQueryBuilder();
     await queryBuilder.update(Room, { 
       messages: () => `messages || '${JSON.stringify(message)}'::jsonb`
     })
       .where("id = :id", { id: roomId })
       .execute()
+
+    if (io) {
+      io.to(`${roomId}`).emit('message', {
+        message,
+        roomId
+      });
+    }
     
     return await this.roomRepository.findOne({
       where: { id: roomId },
@@ -39,13 +56,14 @@ export class RoomService {
   async findRoomWithUsersId(receiverId: number, senderId: number) {
     const queryBuilder = this.roomRepository.createQueryBuilder('room');
 
+    // Fetch rooms where both the sender and receiver are users
     const rooms = await queryBuilder
-      .select()
-      .innerJoin('room.users', 'u')
-      .where('"u"."id" = :senderId', { senderId })
+      .innerJoin('room.users', 'sender', 'sender.id = :senderId', { senderId })
+      .innerJoin('room.users', 'receiver', 'receiver.id = :receiverId', { receiverId })
       .getMany();
 
-    return !!rooms ?.some(room => room.users);
+    // Return true if any rooms are found, false otherwise
+    return rooms.length > 0;
   }
 }
 

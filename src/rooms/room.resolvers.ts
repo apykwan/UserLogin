@@ -13,7 +13,7 @@ export const roomResolvers: Resolvers = {
       return await roomService.addMessageToRoom(input.roomId, {
         content: input.message,
         from: context.currentUser.userId
-      });
+      }, context.io);
     },
 
     async createRoom(parent, { input }, context) {
@@ -31,6 +31,14 @@ export const roomResolvers: Resolvers = {
         content: input.message,
         from: context.currentUser.userId
       })
+    }
+  },
+  Query: {
+    async getRooms(parent, {}, context) {
+      if (!context.authorized) 
+        throw new GraphQLError('unAuthorized', { extensions: { code: 'UNAUTHORIZED' }});
+
+      return await roomService.getAllRooms(context.currentUser.userId);
     }
   }
 };

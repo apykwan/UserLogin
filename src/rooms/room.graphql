@@ -25,5 +25,5 @@ type Mutation {
 }
 
 type Query {
-  rooms: [Room]
+  getRooms: [Room]
 }

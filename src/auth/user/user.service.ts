@@ -1,4 +1,6 @@
+import { GraphQLError } from 'graphql';
 import { In, Repository } from 'typeorm';
+import { validateOrReject } from 'class-validator';
 import bcrypt from 'bcrypt';
 
 import { User } from './entity/user.entity';
@@ -9,10 +11,21 @@ export class UserService {
   constructor(public userRepository: Repository<User>) {}
 
   async create(signupInput: SignupInput) {
-    const password = await bcrypt.hash(signupInput.password, 10);
-    const user = this.userRepository.create({ ...signupInput, password });
+    const user = this.userRepository.create(signupInput);
 
-    return await this.userRepository.save(user);
+    try {
+      await validateOrReject(user);
+
+      user.password = await bcrypt.hash(signupInput.password, 10);
+      return await this.userRepository.save(user);
+    } catch (errors) {
+      throw new GraphQLError('validation error', {
+        extensions: {
+          errors,
+          code: 'BAD_USER_INPUT'
+        }
+      });
+    }
   }
 
   async findOneByEmail(email: string) {
