@@ -1,10 +1,12 @@
 import { ApolloServer, ExpressContext } from 'apollo-server-express';
+import { mergeResolvers } from '@graphql-tools/merge';
 import express from 'express';
 import http from 'http';
 import { readFileSync } from 'fs';
 import jwt from 'jsonwebtoken';
 
 import { AppDataSource } from './app-data.source';
+import { roomResolvers } from './rooms/room.resolvers';
 import { authResolvers } from './auth/auth.resolvers';
 import { Resolvers, JwtPayload } from './__generated__/resolvers-types';
 
@@ -48,4 +50,6 @@ export class AppModule {
   }
 }
 
-export const appModule = new AppModule(authResolvers);
+export const appModule = new AppModule(
+  mergeResolvers([authResolvers, roomResolvers])
+);

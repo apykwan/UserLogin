@@ -23,16 +23,39 @@ export type AuthResponse = {
   user: User;
 };
 
+export type CreateRoomInput = {
+  message: Scalars['String']['input'];
+  receiver: Scalars['Int']['input'];
+};
+
 export type JwtPayload = {
   __typename?: 'JwtPayload';
   email: Scalars['String']['output'];
   userId: Scalars['Int']['output'];
 };
 
+export type Message = {
+  __typename?: 'Message';
+  content: Scalars['String']['output'];
+  from: Scalars['Int']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  createRoom?: Maybe<Room>;
+  sendMsg?: Maybe<Room>;
   signin: AuthResponse;
   signup: AuthResponse;
+};
+
+
+export type MutationCreateRoomArgs = {
+  input: CreateRoomInput;
+};
+
+
+export type MutationSendMsgArgs = {
+  input: SendMessageInput;
 };
 
 
@@ -48,6 +71,19 @@ export type MutationSignupArgs = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<JwtPayload>;
+  rooms?: Maybe<Array<Maybe<Room>>>;
+};
+
+export type Room = {
+  __typename?: 'Room';
+  id: Scalars['Int']['output'];
+  messages?: Maybe<Array<Maybe<Message>>>;
+  users?: Maybe<Array<Maybe<User>>>;
+};
+
+export type SendMessageInput = {
+  message: Scalars['String']['input'];
+  roomId: Scalars['Int']['input'];
 };
 
 export type SigninInput = {
@@ -145,10 +181,14 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   AuthResponse: ResolverTypeWrapper<AuthResponse>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CreateRoomInput: CreateRoomInput;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   JwtPayload: ResolverTypeWrapper<JwtPayload>;
+  Message: ResolverTypeWrapper<Message>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
+  Room: ResolverTypeWrapper<Room>;
+  SendMessageInput: SendMessageInput;
   SigninInput: SigninInput;
   SignupInput: SignupInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -159,10 +199,14 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   AuthResponse: AuthResponse;
   Boolean: Scalars['Boolean']['output'];
+  CreateRoomInput: CreateRoomInput;
   Int: Scalars['Int']['output'];
   JwtPayload: JwtPayload;
+  Message: Message;
   Mutation: {};
   Query: {};
+  Room: Room;
+  SendMessageInput: SendMessageInput;
   SigninInput: SigninInput;
   SignupInput: SignupInput;
   String: Scalars['String']['output'];
@@ -181,13 +225,29 @@ export type JwtPayloadResolvers<ContextType = MyContext, ParentType extends Reso
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type MessageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = ResolversObject<{
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  from?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createRoom?: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'input'>>;
+  sendMsg?: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationSendMsgArgs, 'input'>>;
   signin?: Resolver<ResolversTypes['AuthResponse'], ParentType, ContextType, RequireFields<MutationSigninArgs, 'input'>>;
   signup?: Resolver<ResolversTypes['AuthResponse'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'input'>>;
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   currentUser?: Resolver<Maybe<ResolversTypes['JwtPayload']>, ParentType, ContextType>;
+  rooms?: Resolver<Maybe<Array<Maybe<ResolversTypes['Room']>>>, ParentType, ContextType>;
+}>;
+
+export type RoomResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  messages?: Resolver<Maybe<Array<Maybe<ResolversTypes['Message']>>>, ParentType, ContextType>;
+  users?: Resolver<Maybe<Array<Maybe<ResolversTypes['User']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -202,8 +262,10 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
 export type Resolvers<ContextType = MyContext> = ResolversObject<{
   AuthResponse?: AuthResponseResolvers<ContextType>;
   JwtPayload?: JwtPayloadResolvers<ContextType>;
+  Message?: MessageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Room?: RoomResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 }>;
 

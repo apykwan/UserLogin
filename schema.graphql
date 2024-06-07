@@ -1,3 +1,38 @@
+# generated Schema - do not edit # 
+
+type Message {
+  from: Int!
+  content: String!
+}
+
+type Room {
+  id: Int!
+  users: [User]
+  messages: [Message]
+}
+
+input SendMessageInput {
+  message: String!
+  roomId: Int!
+}
+
+input CreateRoomInput {
+  message: String!
+  receiver: Int!
+}
+
+type Mutation {
+  sendMsg(input: SendMessageInput!): Room
+  createRoom(input: CreateRoomInput!): Room
+  signup(input: SignupInput!): AuthResponse!
+  signin(input: SigninInput!): AuthResponse!
+}
+
+type Query {
+  rooms: [Room]
+  currentUser: JwtPayload
+}
+
 type User {
   id: Int!
   email: String!
@@ -28,16 +63,7 @@ type JwtPayload {
   userId: Int!
 }
 
-type Mutation {
-  signup(input: SignupInput!): AuthResponse!
-  signin(input: SigninInput!): AuthResponse!
-}
-
-type Query {
-  currentUser: JwtPayload
-}
-
 schema {
-  mutation: Mutation
   query: Query
+  mutation: Mutation
 }
